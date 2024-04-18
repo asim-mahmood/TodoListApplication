@@ -14,7 +14,9 @@ a,
   transition: 0.4s;
   padding: 3px;
 }
-
+.welcome-screen {
+  height: 80vh;
+}
 @media (hover: hover) {
 }
 

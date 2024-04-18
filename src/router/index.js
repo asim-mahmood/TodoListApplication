@@ -9,20 +9,20 @@ const router = createRouter({
       name: 'home',
       component: HomeView
     },
-    {
-      path: '/about',
-      name: 'about',
-      component: () => import('../views/AboutView.vue')
-    },
+    // {
+    //   path: '/about',
+    //   name: 'about',
+    //   component: () => import('../views/AboutView.vue')
+    // },
     {
       path: '/login',
       name: 'login',
-      component: () => import('../views/Login.vue')
+      component: () => import('../views/LoginUser.vue')
     },
     {
       path: '/register',
       name: 'register',
-      component: () => import('../views/Register.vue')
+      component: () => import('../views/RegisterUser.vue')
     },
     {
       path: '/todo-list',
@@ -30,6 +30,21 @@ const router = createRouter({
       component: () => import('../views/TodoList.vue')
     }
   ]
+})
+const isAuthenticated = () => {
+  const token = localStorage.getItem('token')
+  return !!token // Returns true if token exists, false otherwise
+}
+
+// Before each navigation, check if route requires authentication
+router.beforeEach((to, from, next) => {
+  if (to.meta.requiresAuth && !isAuthenticated()) {
+    // If route requires authentication and user is not authenticated, redirect to login
+    next('/login')
+  } else {
+    // Continue with navigation
+    next()
+  }
 })
 
 export default router
