@@ -1,4 +1,3 @@
-<!-- toDoModal.vue -->
 <template>
   <div>
     <div
@@ -11,7 +10,9 @@
       <div class="modal-dialog modal-lg">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="toDoModalLabel">Create New To-do</h5>
+            <h5 class="modal-title" id="toDoModalLabel">
+              {{ modalType === 'edit' ? 'Edit Todo' : 'Create New Todo' }}
+            </h5>
             <button
               type="button"
               class="btn-close"
@@ -44,8 +45,8 @@
             >
               Close
             </button>
-            <button type="button" class="btn btn-outline-primary px-4" @click="createToDo">
-              Create
+            <button type="button" class="btn btn-outline-primary px-4" @click="performAction">
+              {{ modalType === 'edit' ? 'Update' : 'Create' }}
             </button>
           </div>
         </div>
@@ -55,30 +56,71 @@
 </template>
 
 <script>
+import { ref } from 'vue' // Import ref from Vue 3
+import { useRouter } from 'vue-router'
+import axios from 'axios'
+
 export default {
-  data() {
-    return {
-      title: '',
-      description: ''
-    }
+  props: {
+    showModal: Boolean,
+    modalType: String,
+    todo: Object
   },
-  methods: {
-    createToDo() {
-      // Here you can add your logic to create the ToDo item
-      console.log('Creating new ToDo:', { title: this.title, description: this.description })
-      // Redirect to ToDo list screen after successfully creating the ToDo item
-      this.$router.push('/todo-list')
-      // Close the modal
-      this.closeModal()
-    },
-    closeModal() {
-      // Reset the form fields when the modal is closed
-      this.title = ''
-      this.description = ''(
-        // Hide the modal
-        '#toDoModal'
-      ).modal('hide')
+  setup(props) {
+    const router = useRouter()
+    const title = ref(props.todo ? props.todo.title : '') // Initialize title with todo title if provided
+    const description = ref(props.todo ? props.todo.description : '') // Initialize description with todo description if provided
+
+    const performAction = async () => {
+      try {
+        const token = localStorage.getItem('token')
+        const config = {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+
+        if (props.modalType === 'edit') {
+          // Update todo
+          const response = await axios.put(
+            `http://3.232.244.22/api/item/${props.todo.id}`,
+            {
+              title: title.value,
+              description: description.value
+            },
+            config
+          )
+          console.log('Response from API:', response.data)
+        } else {
+          // Create new todo
+          const response = await axios.post(
+            'http://3.232.244.22/api/item',
+            {
+              title: title.value,
+              description: description.value
+            },
+            config
+          )
+          console.log('Response from API:', response.data)
+        }
+
+        // Redirect to todo list
+        router.push('/todo-list')
+
+        // Close the modal
+        // closeModal()
+      } catch (error) {
+        console.error('Error:', error)
+        // Handle error
+      }
     }
+
+    // const closeModal = () => {
+    //   // Emit event to close the modal
+    //   emit('close-modal')
+    // }
+
+    return { title, description, performAction } // Expose variables and methods to the template
   }
 }
 </script>
