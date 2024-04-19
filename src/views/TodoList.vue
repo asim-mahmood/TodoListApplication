@@ -2,7 +2,9 @@
   <div class="row no-gutters">
     <div class="d-flex justify-content-between">
       <div>Logged in as: {{ email }}</div>
-      <button v-if="isAuthenticated" @click="logout">logout</button>
+      <button type="button" class="btn btn-info" v-if="isAuthenticated" @click="logout">
+        logout
+      </button>
     </div>
     <div class="text-center mb-4 border-bottom">
       <h1>ToDo List</h1>
@@ -27,7 +29,7 @@
         Create New ToDo
       </button>
     </div>
-    <ul class="list-group mb-3" v-for="(todo, index) in filteredTodos" :key="todo.id">
+    <ul class="list-group mb-3 px-2 pt-3" v-for="(todo, index) in filteredTodos" :key="todo.id">
       <li class="list-group-item">
         <span
           class="cursor-pointer"
